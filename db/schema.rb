@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_09_09_075752) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_11_132216) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "challenges", force: :cascade do |t|
+    t.string "name"
+    t.string "module"
+    t.text "content"
+    t.text "system_prompt"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "chats", force: :cascade do |t|
+    t.string "title"
+    t.bigint "user_id", null: false
+    t.bigint "challenge_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["challenge_id"], name: "index_chats_on_challenge_id"
+    t.index ["user_id"], name: "index_chats_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.string "role"
+    t.text "content"
+    t.bigint "chat_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_id"], name: "index_messages_on_chat_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -29,4 +57,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_09_075752) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "chats", "challenges"
+  add_foreign_key "chats", "users"
+  add_foreign_key "messages", "chats"
 end
